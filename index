@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gel Electrophoresis Simulation</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+    }
+    .gel-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+    .lane {
+      width: 80px;
+      height: 600px;
+      background: #fff;
+      border: 2px solid #333;
+      position: relative;
+    }
+    .band {
+      position: absolute;
+      height: 4px;
+      background: #000;
+      width: 100%;
+    }
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .controls input {
+      width: 60px;
+    }
+    h2 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h2>จำลองการแยกชิ้น DNA ด้วย Agarose Gel</h2>
+
+<div class="gel-container" id="gel">
+  <div class="lane" id="lane1"></div>
+  <div class="lane" id="lane2"></div>
+  <div class="lane" id="lane3"></div>
+  <div class="lane" id="lane4"></div>
+  <div class="lane" id="lane5"></div>
+</div>
+
+<div class="controls">
+  <div>
+    <label>Lane:</label>
+    <select id="laneSelect">
+      <option value="2">Lane 2</option>
+      <option value="3">Lane 3</option>
+      <option value="4">Lane 4</option>
+      <option value="5">Lane 5</option>
+    </select>
+  </div>
+  <div>
+    <label># of Bands:</label>
+    <input type="number" id="bandCount" min="1" max="10" value="1" />
+  </div>
+  <div>
+    <label>Sizes (bp, comma-separated):</label>
+    <input type="text" id="bandSizes" placeholder="1500, 900, ..." />
+  </div>
+  <button onclick="addBands()">Add Bands</button>
+</div>
+
+<script>
+  // Random ladder sizes from 400 to 24000 (16 values)
+  const ladderSizes = [...Array(16)].map(() => Math.floor(Math.random() * (24000 - 400 + 1)) + 400);
+  ladderSizes.sort((a, b) => b - a); // Sort descending
+
+  const gelHeight = 600;
+  const minSize = 24000;
+  const maxSize = 400;
+
+  function sizeToY(size) {
+    // Simulate migration: larger bp stays higher (closer to 0)
+    const logSize = Math.log10(size);
+    const logMin = Math.log10(minSize);
+    const logMax = Math.log10(maxSize);
+    const scale = (logSize - logMin) / (logMax - logMin);
+    return scale * gelHeight;
+  }
+
+  function drawLadder() {
+    const lane = document.getElementById("lane1");
+    ladderSizes.forEach(size => {
+      const band = document.createElement("div");
+      band.className = "band";
+      band.style.top = `${sizeToY(size)}px`;
+      lane.appendChild(band);
+    });
+  }
+
+  function addBands() {
+    const laneId = "lane" + document.getElementById("laneSelect").value;
+    const lane = document.getElementById(laneId);
+    const count = parseInt(document.getElementById("bandCount").value);
+    const sizes = document.getElementById("bandSizes").value
+      .split(",")
+      .map(s => parseInt(s.trim()))
+      .filter(s => !isNaN(s));
+
+    if (sizes.length !== count) {
+      alert("จำนวนชิ้น DNA ที่กรอกไม่ตรงกับจำนวนที่เลือก");
+      return;
+    }
+
+    // Clear lane before adding new bands
+    lane.innerHTML = "";
+
+    sizes.forEach(size => {
+      const band = document.createElement("div");
+      band.className = "band";
+      band.style.background = "blue";
+      band.style.top = `${sizeToY(size)}px`;
+      lane.appendChild(band);
+    });
+  }
+
+  drawLadder();
+</script>
+
+</body>
+</html>
