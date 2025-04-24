@@ -43,6 +43,7 @@
 </head>
 <body>
 
+  <h2>Gel Simulation Loaded!</h2>
 <h2>จำลองการแยกชิ้น DNA ด้วย Agarose Gel</h2>
 
 <div class="gel-container" id="gel">
